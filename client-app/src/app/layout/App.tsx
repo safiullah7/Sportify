@@ -1,29 +1,71 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { Header, Icon, List, Container } from 'semantic-ui-react'
+import { Container } from 'semantic-ui-react'
 import axios from 'axios';
 import { IActivity } from '../models/activity';
 import { NavBar } from '../../features/nav/NavBar';
+import { ActivityDashboard } from '../../features/activities/dashboard/ActivityDashboard';
 
 
 const App = () => {
+
   const [activities, setActivities] = useState<IActivity[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<IActivity | null>(null);
+  const [editMode, setEditMode] = useState<Boolean>(false);
+
   useEffect(() => {
     axios.get<IActivity[]>('http://localhost:5000/api/activities')
       .then((response) => {
-        setActivities(response.data);
+        let activities: IActivity[] = [];
+        response.data.forEach(activity => {
+          activity.date = activity.date.split('.')[0];
+          activities.push(activity);
+        })
+        setActivities(activities);
       });
   }, []) // to run this once and not infinitly to keep getting the data
   // when state changes, useEffect is called. So it will become infinite loop
 
+  const handleSelectedActivity = (id: string) => {
+    setSelectedActivity(activities.filter(a => a.id === id)[0]);
+    setEditMode(false);
+  }
+
+  const handleOpenCreateForm = () => {
+    setSelectedActivity(null);
+    setEditMode(true);
+  }
+
+  const handleCreateActivity = (activity: IActivity) => {
+    setActivities([...activities, activity]);
+    setSelectedActivity(activity);
+    setEditMode(false);
+  };
+
+  const handleEditActivity = (activity: IActivity) => {
+    setActivities([...activities.filter(a => a.id !== activity.id), activity]);
+    setSelectedActivity(activity);
+    setEditMode(false);
+  };
+
+  const handleDeleteActivity = (id: string) => {
+    setActivities([...activities.filter(a => a.id !== id)]);
+  };
+
   return (
     <Fragment>
-      <NavBar />
+      <NavBar handleOpenCreateForm={handleOpenCreateForm}/>
       <Container style={{marginTop: '7em'}}>
-        <List>
-          {activities.map((activity) => (
-            <List.Item key={activity.id}>{activity.title}</List.Item>
-          ))}
-        </List>
+        <ActivityDashboard 
+          activities={activities} 
+          selectActivity={handleSelectedActivity}
+          selectedActivity={selectedActivity} // '!' used to override the typesafety by typescript - when we know what we're doing
+          editMode={editMode}
+          setEditMode={setEditMode}
+          setSelectedActivity={setSelectedActivity}
+          createActivity={handleCreateActivity}
+          editActivity={handleEditActivity}
+          deleteActivity={handleDeleteActivity}
+          />
       </Container>
     </Fragment>
   );
