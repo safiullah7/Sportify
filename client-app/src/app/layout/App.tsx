@@ -1,39 +1,32 @@
-import React, {Component} from 'react';
-import { Header, Icon, List } from 'semantic-ui-react'
+import React, { useState, useEffect, Fragment } from 'react';
+import { Header, Icon, List, Container } from 'semantic-ui-react'
 import axios from 'axios';
 import { IActivity } from '../models/activity';
+import { NavBar } from '../../features/nav/NavBar';
 
-interface IState {
-  activities: IActivity[]
-}
 
-class App extends Component<{}, IState> {
-  readonly state: IState = {
-    activities: []
-  };
-  componentDidMount() {
+const App = () => {
+  const [activities, setActivities] = useState<IActivity[]>([]);
+  useEffect(() => {
     axios.get<IActivity[]>('http://localhost:5000/api/activities')
-          .then((response) => {
-            this.setState({
-              activities: response.data
-            });
-          });
-  }
-  render() {
-    return (
-      <div>
-        <Header as='h2'>
-          <Icon name='users' />
-          <Header.Content>Reactivities</Header.Content>
-        </Header>
+      .then((response) => {
+        setActivities(response.data);
+      });
+  }, []) // to run this once and not infinitly to keep getting the data
+  // when state changes, useEffect is called. So it will become infinite loop
+
+  return (
+    <Fragment>
+      <NavBar />
+      <Container style={{marginTop: '7em'}}>
         <List>
-            {this.state.activities.map((activity) => (
-              <List.Item key={activity.id}>{activity.title}</List.Item>
-            ))}
+          {activities.map((activity) => (
+            <List.Item key={activity.id}>{activity.title}</List.Item>
+          ))}
         </List>
-      </div>
-    );
-  }
+      </Container>
+    </Fragment>
+  );
 }
 
 export default App;
