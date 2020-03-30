@@ -1,34 +1,32 @@
-import React, { SyntheticEvent } from 'react'
+import React, { SyntheticEvent, useContext } from 'react'
 import { Grid } from 'semantic-ui-react';
 import { IActivity } from '../../../app/models/activity';
-import { ActivityList } from './ActivityList';
-import { ActivityDetails } from '../details/ActivityDetails';
-import { ActivityForm } from '../form/ActivityForm';
+import ActivityList from './ActivityList';
+import ActivityDetails from '../details/ActivityDetails';
+import ActivityForm from '../form/ActivityForm';
+import { observer } from 'mobx-react-lite';
+import ActivityStore from '../../../app/stores/activityStore';
 
 interface IProps {
-    activities: IActivity[],
-    selectActivity: (id: string) => void,
-    selectedActivity: IActivity | null,
-    editMode: Boolean,
     setEditMode: (editMode: Boolean) => void,
     setSelectedActivity: (activity: IActivity | null) => void,
-    createActivity: (activity: IActivity) => void,
     editActivity: (activity: IActivity) => void,
     deleteActivity: (e: SyntheticEvent<HTMLButtonElement>,id: string) => void,
     submitting: boolean,
     target: string
 }
 
-export const ActivityDashboard: React.FC<IProps> = 
-    ({ activities, selectActivity, selectedActivity, editMode, setEditMode, setSelectedActivity,
-        createActivity, editActivity, deleteActivity, submitting, target }) => {
+const ActivityDashboard: React.FC<IProps> = 
+    ({ setEditMode, setSelectedActivity,
+        editActivity, deleteActivity, submitting, target }) => {
+    
+    const activityStore = useContext(ActivityStore);
+    const {selectedActivity, editMode} = activityStore;
+    
     return (
-        <div>
             <Grid>
                 <Grid.Column width={10}>
-                    <ActivityList 
-                        activities={activities} 
-                        selectActivity={selectActivity}
+                    <ActivityList
                         deleteActivity={deleteActivity}
                         submitting={submitting}
                         target={target}
@@ -38,7 +36,6 @@ export const ActivityDashboard: React.FC<IProps> =
                     {
                         selectedActivity && !editMode &&
                         <ActivityDetails
-                            activity={selectedActivity}
                             setEditMode={setEditMode}
                             setSelectedActivity={setSelectedActivity}
                         />
@@ -48,12 +45,12 @@ export const ActivityDashboard: React.FC<IProps> =
                         key={selectedActivity && selectedActivity.id || 0}
                         setEditMode={setEditMode}
                         activity={selectedActivity!}
-                        createActivity={createActivity}
                         editActivity={editActivity}
                         submitting={submitting}
                     />}
                 </Grid.Column>
             </Grid>
-        </div>
-    )
-}
+    );
+};
+
+export default observer(ActivityDashboard);
