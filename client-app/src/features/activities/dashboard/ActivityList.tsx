@@ -2,11 +2,17 @@ import React, { useContext } from 'react'
 import { Item, Button, Label, Segment } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
 import ActivityStore from '../../../app/stores/activityStore';
+import { Link } from 'react-router-dom';
 
 const ActivityList: React.FC = () => {
     
     const activityStore = useContext(ActivityStore);
-    let {activitiesByDate, selectActivity, deleteActivity, submitting, target} = activityStore;
+    let {
+        activitiesByDate, 
+        deleteActivity, 
+        submitting, 
+        target
+    } = activityStore;
     
     return (
         // floating right in the item. need to clear other floats
@@ -24,7 +30,7 @@ const ActivityList: React.FC = () => {
                                 </Item.Description>
                                 <Item.Extra>
                                     <Button floated='right' content='View' color='blue'
-                                        onClick={() => selectActivity(activity.id)}                                         
+                                        as={Link} to={`/activities/${activity.id}`}
                                     />
                                     <Button name={activity.id} loading={target === activity.id && submitting} floated='right' content='Delete' color='red'
                                         onClick={(e) => deleteActivity(e,activity.id)}                                         

@@ -1,31 +1,29 @@
-import React, { SyntheticEvent, useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Grid } from 'semantic-ui-react';
 import ActivityList from './ActivityList';
-import ActivityDetails from '../details/ActivityDetails';
-import ActivityForm from '../form/ActivityForm';
 import { observer } from 'mobx-react-lite';
 import ActivityStore from '../../../app/stores/activityStore';
-
+import LoadingComponent from '../../../app/layout/LoadingComponent';
 
 const ActivityDashboard: React.FC = () => {
-    
     const activityStore = useContext(ActivityStore);
-    const {selectedActivity, editMode} = activityStore;
-    
+
+    useEffect(() => {
+        activityStore.loadActivities();
+    }, [activityStore]);
+    // to run this once and not infinitly to keep getting the data
+    // when state changes, useEffect is called. So it will become infinite loop
+
+    if (activityStore.loadingInitial)
+        return <LoadingComponent content='Loading activities...'/>
+    else
     return (
             <Grid>
                 <Grid.Column width={10}>
                     <ActivityList />
                 </Grid.Column>
                 <Grid.Column width={6}>
-                    {
-                        selectedActivity && !editMode && (<ActivityDetails />)
-                    }
-                    {editMode && 
-                    <ActivityForm
-                        key={selectedActivity && selectedActivity.id || 0}
-                        activity={selectedActivity!}
-                    />}
+                    <h2>Activity Filters</h2>
                 </Grid.Column>
             </Grid>
     );
