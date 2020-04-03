@@ -13,7 +13,9 @@ interface DetailParams {
     id: string
 }
 
-const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = ({ match }) => {
+const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = ({ 
+    match
+ }) => {
 
     const activityStore = useContext(ActivityStore);
     const { 
@@ -24,10 +26,15 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = ({ match })
 
     useEffect(() => {
         loadActivity(match.params.id);
+        // .catch(() => {
+        //     history.push('/notfound'); //anythingBecauseItllGoToNotFoundPage
+        // });
     }, [loadActivity, match.params.id]) // if we dont put second param, it'll run after every time component mounts
     // if we put second param, it ensures that it runs once only after component mounts
 
-    if (loadingInitial || !activity) return <LoadingComponent content='Loading activity...' />
+    if (loadingInitial) return <LoadingComponent content='Loading activity...' />
+
+    else if (!activity) return <h1>Activity Not found</h1>
 
     return (
         <Grid>

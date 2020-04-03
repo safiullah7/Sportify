@@ -1,18 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'react-toastify/dist/ReactToastify.min.css'
 import './app/layout/styles.css';
 import App from './app/layout/App';
-import { BrowserRouter } from 'react-router-dom';
+import { Router } from 'react-router-dom';
+import {createBrowserHistory} from 'history';
 import * as serviceWorker from './serviceWorker';
 import ScrollToTop from './app/layout/ScrollToTop';
 
+export const history = createBrowserHistory();
+
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <Router history={history}>
+      {/* Changing from <BrowserRouter/> to <Router/> to redirect in agent.tsx
+      when there is a 400s error by exporting history object and using it in
+      agent.tsx */}
       <ScrollToTop>
         <App />
       </ScrollToTop>
-    </BrowserRouter>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );

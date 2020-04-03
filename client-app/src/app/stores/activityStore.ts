@@ -32,7 +32,6 @@ class ActivityStore {
 
     @action loadActivities = async () => {
         this.loadingInitial = true;
-        debugger;
         try {
             let activities = await agent.Activities.list();
             runInAction('loading activities', () => {
@@ -62,10 +61,11 @@ class ActivityStore {
                     this.activity = activity;
                     this.loadingInitial = false;
                 })
-            } catch(error) {
+            } catch (error) {
                 runInAction('getting activity error', () => {
                     this.loadingInitial = false;
                 })
+                // throw error; // catch in activitydetails comp
                 console.log(error);
             }
         }
