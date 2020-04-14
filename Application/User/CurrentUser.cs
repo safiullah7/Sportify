@@ -28,7 +28,7 @@ namespace Application.User
                 // handler logic goes here
                 var user = await _userManager.FindByNameAsync(_userAccessor.GetCurrentUsername());
 
-                return new User 
+                return new User
                 {
                     DisplayName = user.DisplayName,
                     Username = user.UserName,
