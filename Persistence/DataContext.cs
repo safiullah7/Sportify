@@ -1,10 +1,13 @@
-﻿using System;
-using Domain;
+﻿using Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence
 {
-    public class DataContext: DbContext
+    // instead of inheriting from DbContext, Use IdentityDbContext
+    // with the class that uses it (AppUser)
+    // add base.OnModelCreating(builder) in the OnModelCreating as well afterwards.
+    public class DataContext: IdentityDbContext<AppUser>
     {
         public DataContext(DbContextOptions options) : base(options)
         {
@@ -13,12 +16,13 @@ namespace Persistence
         public DbSet<Activity> Activities { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
             builder.Entity<Value>()
-                    .HasData(
-                        new Value { Id = 1, Name = "Value 101"},
-                        new Value { Id = 2, Name = "Value 102"},
-                        new Value { Id = 3, Name = "Value 103"}
-                    );
+                .HasData(
+                    new Value { Id = 1, Name = "Value 101"},
+                    new Value { Id = 2, Name = "Value 102"},
+                    new Value { Id = 3, Name = "Value 103"}
+                );
         }
     }
 }
