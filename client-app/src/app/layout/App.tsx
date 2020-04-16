@@ -10,6 +10,7 @@ import ActivityDetails from '../../features/activities/details/ActivityDetails';
 import { RouteComponentProps, Switch } from 'react-router';
 import NotFound from './NotFound';
 import {ToastContainer} from 'react-toastify';
+import LoginForm from '../../features/user/LoginForm';
 
 const App: React.FC<RouteComponentProps> = ({ location }) => {
   return (
@@ -27,6 +28,9 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
               <Route path='/activities/:id' component={ActivityDetails} />
               <Route key={location.key} path={['/createActivity', '/manage/:id']}
                 component={ActivityForm} />
+
+              <Route path='/login' component={LoginForm} />
+
               <Route component={NotFound} />
               {/* // this will load <NotFound/> comp in every route.
               // need to make use of switch */}
