@@ -15,7 +15,6 @@ dateFnsLocalizer();
 export const history = createBrowserHistory();
 
 ReactDOM.render(
-  <React.StrictMode>
     <Router history={history}>
       {/* Changing from <BrowserRouter/> to <Router/> to redirect in agent.tsx
       when there is a 400s error by exporting history object and using it in
@@ -23,8 +22,7 @@ ReactDOM.render(
       <ScrollToTop>
         <App />
       </ScrollToTop>
-    </Router>
-  </React.StrictMode>,
+    </Router>,
   document.getElementById('root')
 );
 
