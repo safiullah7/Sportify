@@ -2,6 +2,7 @@ using System.Text;
 using API.Middleware;
 using Application.Activities;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using FluentValidation.AspNetCore;
 using Infrastructure.Security;
@@ -34,6 +35,7 @@ namespace API
         public void ConfigureServices(IServiceCollection services) // dependency injection container
         {
             services.AddDbContext<DataContext>(opt => {
+                opt.UseLazyLoadingProxies(); // next: tell ef about navigation props. AppUser.cs and Activity.cs has them
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
             
@@ -44,6 +46,8 @@ namespace API
             });
             
             services.AddMediatR(typeof(List.Handler).Assembly); // we do this for one, it handles for the rest!
+
+            services.AddAutoMapper(typeof(List.Handler)); // easy way to tell that go and look in application assembly
             
             services.AddControllers(opt => {
                 // add a policy that every request needs to be authenticated!!!
