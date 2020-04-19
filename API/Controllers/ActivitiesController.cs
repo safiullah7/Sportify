@@ -30,7 +30,14 @@ namespace API.Controllers
             return await Mediator.Send(command);
         }
 
+/* 
+    1. Only Host should be able to Edit and Delete. Introducing Custom Auth policy
+    2. Made class IsHostRequirement
+    3. Startup.cs configs
+    4. Controller method attributes of policy
+*/
         [HttpPut("{id}")]
+        [Authorize(Policy = "IsActivityHost")]
         public async Task<ActionResult<Unit>> Edit(Guid id, Edit.Command command)
         {
             command.Id = id;
@@ -38,6 +45,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = "IsActivityHost")]
         public async Task<ActionResult<Unit>> Delete(Guid id)
         {
             return await Mediator.Send(new Delete.Command{Id = id});

@@ -34,21 +34,26 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) // dependency injection container
         {
+            #region "DbContext => 1. LazyLoading | 2. SQLite"
             services.AddDbContext<DataContext>(opt => {
                 opt.UseLazyLoadingProxies(); // next: tell ef about navigation props. AppUser.cs and Activity.cs has them
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
+            #endregion
             
+            #region "Add Cors policy"
             services.AddCors(opt => {
                 opt.AddPolicy("CorsPolicy", policy => {
                     policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
                 });
             });
+            #endregion
             
             services.AddMediatR(typeof(List.Handler).Assembly); // we do this for one, it handles for the rest!
 
             services.AddAutoMapper(typeof(List.Handler)); // easy way to tell that go and look in application assembly
             
+            #region "1. Every request needs to be authenticated | 2. FluentValidations"
             services.AddControllers(opt => {
                 // add a policy that every request needs to be authenticated!!!
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -57,12 +62,26 @@ namespace API
                 .AddFluentValidation(cfg => {
                     cfg.RegisterValidatorsFromAssemblyContaining<Create>(); // only need to add for one. auto for rest Application project
                 });
+            #endregion
 
+            #region "Identity config"
             var builder = services.AddIdentityCore<AppUser>();
             var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
             identityBuilder.AddEntityFrameworkStores<DataContext>();
             identityBuilder.AddSignInManager<SignInManager<AppUser>>();
+            #endregion
 
+            #region "Custom Authorization policy: only host can Edit/Delete"
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("IsActivityHost", policy => {
+                    policy.Requirements.Add(new IsHostRequirement());
+                });
+            });
+            services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+            #endregion
+
+            #region "JWT"
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt => {
@@ -74,9 +93,9 @@ namespace API
                         ValidateIssuer = false
                     };
                 });
-
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IUserAccessor, UserAccessor>();
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
