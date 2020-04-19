@@ -6,6 +6,8 @@ export interface IActivity {
     date: Date,
     city: string,
     venue: string,
+    isGoing: boolean, // specific to currentlyLoggedIn user
+    isHost: boolean, // specific to currentlyLoggedIn user
     attendees: IAttendee[]
 }
 
