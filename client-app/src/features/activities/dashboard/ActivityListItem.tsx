@@ -3,6 +3,7 @@ import { Item, Button, Segment, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { IActivity } from '../../../app/models/activity';
 import {format} from 'date-fns'
+import ActivityListItemAttendees from './ActivityListItemAttendees';
 
 export const ActivityListItem: React.FC<{activity: IActivity}> = ({activity}) => {
     
@@ -27,7 +28,7 @@ export const ActivityListItem: React.FC<{activity: IActivity}> = ({activity}) =>
             </Segment>
             <Segment secondary>
                 {/* secondary will give a little grey colour to separate out */}
-                Attendees will go here
+                <ActivityListItemAttendees attendees={activity.attendees} />
             </Segment>
             <Segment clearing>
                 {/* adding clearing because we have a button here */}
