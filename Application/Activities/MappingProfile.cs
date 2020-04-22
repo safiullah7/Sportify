@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using Domain;
 
@@ -9,7 +10,7 @@ namespace Application.Activities
         3. List/Details.cs > IMapper in ctor, get the mapped object and return
         4. change return type in controller method as well
     */
-    public class MappingProfile : Profile
+    public class MappingProfile : AutoMapper.Profile
     {
         public MappingProfile()
         {
@@ -19,7 +20,8 @@ namespace Application.Activities
             // about the conflicting props, we'll create another Map
             CreateMap<UserActivity, AttendeeDto>()
                 .ForMember(d => d.Username, o => o.MapFrom(s => s.AppUser.UserName))
-                .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.AppUser.DisplayName));
+                .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.AppUser.DisplayName))
+                .ForMember(d => d.Image, o => o.MapFrom(s => s.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url));
         }
     }
 }

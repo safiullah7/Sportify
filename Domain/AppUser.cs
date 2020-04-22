@@ -6,6 +6,7 @@ namespace Domain
     public class AppUser : IdentityUser
     {
         public string DisplayName { get; set; }
+        public string Bio { get; set; }
 
         /*
             1. to introduce User (one) to UserActivity (many) relationship:
@@ -13,5 +14,6 @@ namespace Domain
                we add 'virtual' keyword to them
         */
         public virtual ICollection<UserActivity> UserActivities {get; set;}
+        public virtual ICollection<Photo> Photos { get; set; }
     }
 }
