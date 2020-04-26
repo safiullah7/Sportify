@@ -1,5 +1,6 @@
 import React from 'react'
 import {Tab} from 'semantic-ui-react'
+import ProfilePhotos from './ProfilePhotos';
 
 const panes = [
     {
@@ -8,7 +9,7 @@ const panes = [
     },
     {
         menuItem: 'Photos',
-        render: () => <Tab.Pane>Photos Content</Tab.Pane>
+        render: () => <ProfilePhotos />
     },
     {
         menuItem: 'Activities',
@@ -30,6 +31,7 @@ const ProfileContent = () => {
             menu={{fluid: true, vertical: true}}
             menuPosition='right'
             panes={panes}
+            activeIndex={1}
         />
     )
 }
