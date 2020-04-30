@@ -3,7 +3,6 @@ import { observable, action, runInAction, computed } from "mobx";
 import { IProfile, IPhoto } from "../models/profile";
 import agent from "../api/agent";
 import { toast } from "react-toastify";
-import { async } from "q";
 
 export default class ProfileStore {
     rootStore: RootStore;
@@ -101,6 +100,20 @@ export default class ProfileStore {
             runInAction(() => {
                 this.loading = false;
             })
+        }
+    }
+
+    @action EditProfile = async (values: Partial<IProfile>) => {
+        try {
+            await agent.Profiles.Edit(values);
+            runInAction(() => {
+                if (values.displayName !== this.rootStore.userStore.user!.displayName) {
+                    this.rootStore.userStore.user!.displayName = values.displayName!;
+                }
+                this.profile = {...this.profile!, ...values};
+            })
+        } catch(error) {
+            toast.error('Problem updating profile')
         }
     }
 }

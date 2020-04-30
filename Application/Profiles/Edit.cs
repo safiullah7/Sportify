@@ -23,7 +23,6 @@ namespace Application.Profiles
             public CommandValidator()
             {
                 RuleFor(x => x.DisplayName).NotEmpty();
-                RuleFor(x => x.Bio).NotEmpty();
             }
         }
         public class Handler : IRequestHandler<Command>
@@ -42,8 +41,8 @@ namespace Application.Profiles
                 if (user == null)
                     throw new RestException(HttpStatusCode.NotFound, new {User = "User not found"});
                 
-                user.Bio = request.Bio;
-                user.DisplayName = request.DisplayName;
+                user.DisplayName = request.DisplayName ?? user.DisplayName;
+                user.Bio = request.Bio ?? user.Bio;
 
                 var success = await _context.SaveChangesAsync() > 0;
                 if (success) return Unit.Value;
