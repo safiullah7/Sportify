@@ -20,5 +20,6 @@ namespace Domain
                we add 'virtual' keyword to them
         */
         public virtual ICollection<UserActivity> UserActivities { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
     }
 }
