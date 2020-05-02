@@ -6,7 +6,7 @@ import { history } from '../..';
 import { toast } from 'react-toastify';
 import { RootStore } from './rootStore';
 import { setActivityProps, createAttendee } from '../common/util/util';
-import { async } from 'q';
+import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
 
 export default class ActivityStore {
 
@@ -22,6 +22,58 @@ export default class ActivityStore {
     @observable submitting = false;
     @observable target = '';
     @observable loading = false;
+    @observable.ref hubConnection: HubConnection | null = null;
+    // ref: we wont observing whole ChatHub class, but its only one method. so using ref for that
+
+
+    // we will create a connection ONLY when activity is opened in details view (activitydetails).
+    // we have to stop connection when we move away from the activity details view
+    @action createHubConnection = (activityId: string) => {
+        this.hubConnection = new HubConnectionBuilder()
+            .withUrl('http://localhost:5000/chat', {
+                accessTokenFactory: () => this.rootStore.commonStore.token!
+                // since it is not an http request we're sending, we need to send our token with hub request as well
+                // so that server can identify the token and get the username out of it 
+            })
+            .configureLogging(LogLevel.Information)
+            .build();
+        
+        this.hubConnection.start()
+            .then(() => console.log(this.hubConnection!.state))
+            .then(() => {
+                console.log('attempting to join the group');
+                if (this.hubConnection!.state === 'Connected')
+                    this.hubConnection!.invoke('AddToGroup', activityId);
+            })
+            .catch((error) => console.log('Error establishing connection: ' + error));
+
+        this.hubConnection.on('ReceiveComment', comment => {
+            runInAction(() => {
+                this.activity!.comments.push(comment);
+            })
+        });
+        this.hubConnection.on('Send', message => {
+            toast.info(message);
+        })
+    }
+
+    @action stopHubConnection = () => {
+        this.hubConnection!.invoke('RemoveFromGroup', this.activity!.id)
+            .then(() => {
+                this.hubConnection!.stop();
+            })
+            .then(() => console.log('connection stopped'))
+            .catch((error) => console.log(error));
+    }
+
+    @action addComment = async (values: any) => {
+        values.activityId = this.activity!.id;
+        try {
+            await this.hubConnection!.invoke('SendComment', values);
+        } catch(error) {
+            console.log(error);
+        }
+    }
 
     @computed get activitiesByDate() {
         console.log(this.groupActivitiesByDate(Array.from(this.activityRegistry.values())));
@@ -103,7 +155,10 @@ export default class ActivityStore {
             const attendees = [];
             attendees.push(attendee);
             activity.attendees = attendees;
+            activity.comments = [];
             activity.isGoing = true;
+
+            // above code isnt in runinaction because it doesnt involve an observable or action method
             runInAction('creating activity',() => {
                 this.activityRegistry.set(activity.id, activity);
                 this.submitting = false;

@@ -13,6 +13,7 @@ namespace Domain
             ii. get username from hub context (but you need to make token available for hub context to get username)
             iii. mediator send to handler and get created 'comment' and send it back to all clients attached to this method
         7. to make token available, add new options of 'JwtBearerEvents' in 'AddJwtBearer' in startup
+        8. Add 'AllowCredentials' in cors policy in startup class
     */
     public class Comment
     {
