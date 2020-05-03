@@ -53,9 +53,9 @@ namespace API
             });
             #endregion
             
-            services.AddMediatR(typeof(List.Handler).Assembly); // we do this for one, it handles for the rest!
+            services.AddMediatR(typeof(Application.Activities.List.Handler).Assembly); // we do this for one, it handles for the rest!
 
-            services.AddAutoMapper(typeof(List.Handler)); // easy way to tell that go and look in application assembly
+            services.AddAutoMapper(typeof(Application.Activities.List.Handler)); // easy way to tell that go and look in application assembly
             services.AddSignalR();
             
             #region "1. Every request needs to be authenticated | 2. FluentValidations"
