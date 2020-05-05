@@ -6,6 +6,11 @@ interface IProps {
     attendees: IAttendee[]
 }
 
+const styles = {
+    borderColor: 'orange',
+    borderWidth: 2
+};
+
 const ActivityListItemAttendees: React.FC<IProps> = ({attendees}) => {
     return (
         <List horizontal>
@@ -14,7 +19,10 @@ const ActivityListItemAttendees: React.FC<IProps> = ({attendees}) => {
                     <Popup
                         header={attendee.displayName}
                         trigger={
-                            <Image circular size='mini' src={attendee.image || '/assets/user.png'} />
+                            <Image circular size='mini' 
+                                src={attendee.image || '/assets/user.png'} 
+                                bordered style={attendee.following ? styles : null}
+                            />
                         } />
                     {/* popup is just a hover. Images are shown. and upon hover, their 'Display Name'
                         will be shown in tooltip */}

@@ -3,6 +3,7 @@ import { observable, action, runInAction, computed } from "mobx";
 import { IProfile, IPhoto } from "../models/profile";
 import agent from "../api/agent";
 import { toast } from "react-toastify";
+import { async } from "q";
 
 export default class ProfileStore {
     rootStore: RootStore;
@@ -114,6 +115,40 @@ export default class ProfileStore {
             })
         } catch(error) {
             toast.error('Problem updating profile')
+        }
+    }
+
+    @action follow = async (username: string) => {
+        this.loading = true;
+        try {
+            await agent.Profiles.follow(username);
+            runInAction(() => {
+                this.profile!.following = true;
+                this.profile!.followersCount++;
+                this.loading = false;
+            })
+        } catch (error) {
+            toast.error('Problem following the user');
+            runInAction(() => {
+                this.loading = false;
+            });
+        }
+    }
+
+    @action unfollow = async (username: string) => {
+        this.loading = true;
+        try {
+            await agent.Profiles.unfollow(username);
+            runInAction(() => {
+                this.profile!.following = false;
+                this.profile!.followersCount--;
+                this.loading = false;
+            })
+        } catch (error) {
+            toast.error('Problem unfollowing the user');
+            runInAction(() => {
+                this.loading = false;
+            });
         }
     }
 }
